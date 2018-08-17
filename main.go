@@ -16,7 +16,18 @@ import (
 const PAGE_CNT = "100"
 
 func main() {
-	url := "https://api.github.com/users/brianhodges/repos?per_page=" + PAGE_CNT
+	
+	fmt.Println()
+	
+	if len(os.Args) <= 1 {
+		fmt.Println("You must enter a github user as a parameter.")
+		fmt.Println("Ex. go run main.go brianhodges")
+		os.Exit(1)
+	}
+	
+	username := os.Args[1]
+	fmt.Println(username)
+	url := "https://api.github.com/users/" + username + "/repos?per_page=" + PAGE_CNT
 
 	client := http.Client{
 		Timeout: time.Second * 2,
@@ -35,11 +46,11 @@ func main() {
 	jsonErr := json.Unmarshal(body, &repos)
 	util.Check(jsonErr)
 
-	os.RemoveAll("./repos")
+	os.RemoveAll("./Repos")
 
 	for _, repo := range repos {
 		fmt.Println("Cloning: " + repo.FullName + "...")
-		_, err := git.PlainClone("./repos/"+repo.Name, false, &git.CloneOptions{
+		_, err := git.PlainClone("./Repos/"+repo.Name, false, &git.CloneOptions{
 			URL:               repo.Url,
 			RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 		})
